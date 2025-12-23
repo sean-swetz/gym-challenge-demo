@@ -6,11 +6,6 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, se
 import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, where, getDocs, updateDoc, increment, addDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
 // Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCEVsK66KIJBWtEtc6E4sd5Cu_jBfjSdyM",
@@ -26,6 +21,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
+
+// ===== ADMIN CONFIGURATION =====
 
 // ===== ADMIN CONFIGURATION =====
 // CHANGE THIS TO YOUR ADMIN EMAIL(S)
