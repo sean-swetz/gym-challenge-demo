@@ -23,8 +23,6 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 // ===== ADMIN CONFIGURATION =====
-
-// ===== ADMIN CONFIGURATION =====
 // CHANGE THIS TO YOUR ADMIN EMAIL(S)
 const ADMIN_EMAILS = [
     "seanswetz@pm.me",
@@ -2295,102 +2293,7 @@ Keep crushing it! Next week starts now! 💪`;
         alert('Failed to announce winners: ' + error.message);
     }
 };
-// ===== WEEKLY WINNERS SYSTEM =====
-
-window.announceWeeklyWinners = async function() {
-    if (!isAdmin) return;
-    
-    const confirmed = confirm('This will post the weekly winners to the Locker Room. Continue?');
-    if (!confirmed) return;
-    
-    try {
-        // Get all users
-        const usersQuery = query(collection(db, 'users'));
-        const usersSnapshot = await getDocs(usersQuery);
-        
-        let topIndividual = { name: 'None', points: 0, team: 'none' };
-        const teamTotals = {
-            red: { points: 0, members: 0, name: 'Red Team' },
-            blue: { points: 0, members: 0, name: 'Blue Team' },
-            green: { points: 0, members: 0, name: 'Green Team' },
-            yellow: { points: 0, members: 0, name: 'Yellow Team' },
-            purple: { points: 0, members: 0, name: 'Purple Team' },
-            orange: { points: 0, members: 0, name: 'Orange Team' },
-            pink: { points: 0, members: 0, name: 'Pink Team' },
-            teal: { points: 0, members: 0, name: 'Teal Team' }
-        };
-        
-        // Calculate individual and team winners
-        usersSnapshot.forEach((doc) => {
-            const user = doc.data();
-            if (user.hiddenFromLeaderboard) return;
-            
-            const points = user.totalPoints || 0;
-            
-            // Track top individual
-            if (points > topIndividual.points) {
-                topIndividual = {
-                    name: user.name,
-                    points: points,
-                    team: user.team || 'none'
-                };
-            }
-            
-            // Track team totals
-            const team = user.team || 'none';
-            if (teamTotals[team]) {
-                teamTotals[team].points += points;
-                teamTotals[team].members += 1;
-            }
-        });
-        
-        // Find winning team
-        let topTeam = { name: 'None', points: 0, members: 0 };
-        Object.entries(teamTotals).forEach(([color, data]) => {
-            if (data.members > 0 && data.points > topTeam.points) {
-                topTeam = {
-                    name: data.name,
-                    points: data.points,
-                    members: data.members,
-                    color: color
-                };
-            }
-        });
-        
-        // Get week number (weeks since Jan 1, 2026)
-        const startDate = new Date('2026-01-01');
-        const today = new Date();
-        const weekNumber = Math.floor((today - startDate) / (7 * 24 * 60 * 60 * 1000)) + 1;
-        
-        // Create announcement message
-        const announcement = `🏆 WEEK ${weekNumber} WINNERS! 🏆
-
-🥇 TOP PERFORMER
-${topIndividual.name} with ${topIndividual.points} points!
-
-🏅 WINNING TEAM
-${topTeam.name.toUpperCase()} with ${topTeam.points} points (${topTeam.members} members)
-
-Keep crushing it! Next week starts now! 💪`;
-        
-        // Post to main Locker Room
-        await addDoc(collection(db, 'messages'), {
-            text: announcement,
-            userName: '🏆 Weekly Winners Bot',
-            userId: 'system',
-            team: 'none',
-            photoURL: null,
-            timestamp: new Date().toISOString()
-        });
-        
-        alert('Weekly winners announced! 🎉');
-        loadMessages();
-        
-    } catch (error) {
-        console.error('Announce winners error:', error);
-        alert('Failed to announce winners: ' + error.message);
-    }
-};
+ 
 // Call updateNotificationStatus when profile loads
 // Add this to your loadUserProfile() function at the end:
 // updateNotificationStatus();
