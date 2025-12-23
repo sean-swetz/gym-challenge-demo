@@ -6,15 +6,19 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, se
 import { getFirestore, doc, setDoc, getDoc, collection, query, orderBy, where, getDocs, updateDoc, increment, addDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-// ===== FIREBASE CONFIGURATION =====
-// REPLACE THESE WITH YOUR FIREBASE CONFIG
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyDbvV8uX5OnPRJChm6Q58ca7lyvHg2jqRo",
-    authDomain: "reset-2026-tracker.firebaseapp.com",
-    projectId: "reset-2026-tracker",
-    storageBucket: "reset-2026-tracker.firebasestorage.app",
-    messagingSenderId: "867262535384",
-    appId: "1:867262535384:web:a9d18d62159c657f4ca9ad"
+  apiKey: "AIzaSyCEVsK66KIJBWtEtc6E4sd5Cu_jBfjSdyM",
+  authDomain: "gym-challenge-demo.firebaseapp.com",
+  projectId: "gym-challenge-demo",
+  storageBucket: "gym-challenge-demo.firebasestorage.app",
+  messagingSenderId: "64852352998",
+  appId: "1:64852352998:web:3f164e8ac5f67e0be48027"
 };
 
 // Initialize Firebase
