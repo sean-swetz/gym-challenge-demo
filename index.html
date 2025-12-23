@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reset 2026 Challenge Tracker</title>
+    <link rel="icon" type="image/png" href="https://i.imgur.com/YOUR_FAVICON.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Mobile Hamburger Menu -->
+<div class="hamburger-menu" id="hamburgerMenu" onclick="toggleMobileMenu()">
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+    <div class="hamburger-line"></div>
+</div>
+
+<div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileMenu()"></div>
+
+<div class="mobile-nav-menu" id="mobileNavMenu">
+    <div class="mobile-nav-header">
+        <h3>RESET 2026</h3>
+        <p style="margin: 5px 0 0 0; font-size: 0.9em;">Navigation</p>
+    </div>
+    <div class="mobile-nav-links">
+        <a class="mobile-nav-link active" onclick="mobileShowSection('checkin')">📋 Check In</a>
+        <a class="mobile-nav-link" onclick="mobileShowSection('profile')">👤 My Profile</a>
+        <a class="mobile-nav-link" onclick="mobileShowSection('leaderboard')">📊 The Whiteboard</a>
+        <a class="mobile-nav-link" onclick="mobileShowSection('teams')">👥 Teams</a>
+        <a class="mobile-nav-link" onclick="mobileShowSection('locker')">💬 The Locker Room</a>
+        <a class="mobile-nav-link admin" id="mobileAdminLink" onclick="mobileShowSection('admin')" style="display: none;">🔧 Admin</a>
+        <a class="mobile-nav-link" onclick="logout()" style="color: #ff6b6b; margin-top: 20px;">🚪 Logout</a>
+    </div>
+</div>
+    <div class="loading" id="loading">Loading Reset 2026...</div>
+    
+<!-- Notification Permission Banner -->
+<div id="notificationBanner" style="display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #9BFB02 0%, #7dd102 100%); color: #000; padding: 20px 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); z-index: 1000; max-width: 90%; text-align: center;">
+    <p style="margin: 0 0 15px 0; font-weight: 600; font-size: 1.1em;">📬 Get Check-In Reminders!</p>
+    <p style="margin: 0 0 15px 0; font-size: 0.95em;">We'll send you a friendly reminder when it's time to check in each week.</p>
+    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+        <button onclick="enableNotifications()" style="background: #000; color: #9BFB02; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+            ✅ Enable Notifications
+        </button>
+        <button onclick="dismissNotificationBanner()" style="background: transparent; border: 2px solid #000; color: #000; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+            Maybe Later
+        </button>
+    </div>
+</div>
+    
+    <!-- Authentication Page -->
+    <div id="authPage" style="display: none;">
+        <div class="login-container">
+            <div class="header">
+                <img src="CrossfitProsperity_Logo.png" alt="CrossFit Prosperity" class="header-logo">
+                <h1>RESET 2026</h1>
+                <p class="subtitle">Nutrition & Fitness Challenge</p>
+            </div>
+
+            <div class="card">
+                <div class="auth-tabs">
+                    <div class="auth-tab active" onclick="showAuthTab('login')">Login</div>
+                    <div class="auth-tab" onclick="showAuthTab('register')">Register</div>
+                </div>
+
+                <div class="error-message" id="authError"></div>
+                <div class="success-message" id="authSuccess"></div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form active">
+                    <h2>Welcome Back!</h2>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn" id="loginBtn">Login</button>
+                    <div class="forgot-password">
+                        <a href="#" onclick="showAuthTab('reset'); return false;">Forgot Password?</a>
+                    </div>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="auth-form">
+                    <h2>Join the Challenge</h2>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="regPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn" id="registerBtn">Create Account</button>
+                </form>
+
+                <!-- Password Reset Form -->
+                <form id="resetForm" class="auth-form">
+                    <h2>Reset Password</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Enter your email address and we'll send you a link to reset your password.</p>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="resetEmail" required>
+                    </div>
+                    <button type="submit" class="btn" id="resetBtn">Send Reset Link</button>
+                    <div class="forgot-password">
+                        <a href="#" onclick="showAuthTab('login'); return false;">Back to Login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="app" class="container" style="display: none;">
+        <div class="header">
+            <img src="CrossfitProsperity_Logo.png" alt="CrossFit Prosperity" class="header-logo">
+            <h1>RESET 2026</h1>
+            <p class="subtitle">Nutrition & Fitness Challenge Tracker</p>
+        </div>
+
+        <div class="logged-in-user">
+            <span id="userGreeting">Welcome!</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('checkin')">Check In</button>
+            <button class="nav-btn" onclick="showSection('profile')">My Profile</button>
+            <button class="nav-btn" onclick="showSection('leaderboard')">The Whiteboard</button>
+            <button class="nav-btn" onclick="showSection('teams')">Teams</button>
+            <button class="nav-btn" onclick="showSection('locker')">The Locker Room</button>
+            <button class="nav-btn admin" id="adminNavBtn" onclick="showSection('admin')" style="display: none;">Admin</button>
+        </div>
+
+        <!-- Check In Section -->
+        <div id="checkin" class="section active">
+            <div class="card">
+                <h2>Weekly Check-In</h2>
+                
+                <div id="checkinWindowBanner"></div>
+                
+                <div class="success-message" id="checkinSuccess"></div>
+                <form id="checkinForm">
+                  <div id="dynamicCriteria">
+    <p style="text-align: center; padding: 30px;">Loading criteria...</p>
+</div>
+
+<div class="total-score" id="totalScore">
+    Total Weekly Score: 0 points
+</div>
+
+<button type="submit" class="btn" id="checkinBtn">Submit Check-In</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- My Profile Section -->
+        <div id="profile" class="section">
+            <div class="card">
+                <h2>👤 My Profile</h2>
+                
+                <div class="profile-container">
+                    <img id="profilePhotoDisplay" class="profile-photo large" 
+                         src="https://ui-avatars.com/api/?name=User&background=9BFB02&color=000&size=120" 
+                         alt="Profile Photo">
+                    <div>
+                        <input type="file" id="photoUpload" accept="image/*" style="display: none;" onchange="uploadProfilePhoto()">
+                        <button class="photo-upload-btn" onclick="document.getElementById('photoUpload').click()">
+                            📷 Upload Photo
+                        </button>
+                        <p style="color: #666; font-size: 0.9em; margin-top: 10px;">Max 5MB • JPG, PNG, or GIF • Large images auto-compressed</p>
+                    </div>
+                </div>
+
+                <div class="profile-info-grid">
+                    <div class="profile-info-item">
+                        <label>Nickname</label>
+                        <input type="text" class="profile-edit-input" id="profileNickname" 
+                               placeholder="Your nickname" maxlength="30">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Favorite CrossFit Movement</label>
+                        <input type="text" class="profile-edit-input" id="profileMovement" 
+                               placeholder="e.g., Deadlift, Box Jumps" maxlength="50">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>Favorite Veggie</label>
+                        <input type="text" class="profile-edit-input" id="profileVeggie" 
+                               placeholder="e.g., Broccoli, Carrots" maxlength="50">
+                    </div>
+                    <div class="profile-info-item">
+                        <label>#1 Goal This Challenge</label>
+                        <input type="text" class="profile-edit-input" id="profileGoal" 
+                               placeholder="e.g., Lose 10lbs, PR my deadlift" maxlength="100">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="saveProfile()" style="margin-top: 30px;">
+                    💾 Save Profile
+                </button>
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+    <h3 style="margin-bottom: 15px;">🔔 Notification Settings</h3>
+    <p style="color: #666; margin-bottom: 15px;">
+        Get browser notifications to remind you to check in each week.
+    </p>
+    <div id="notificationStatus"></div>
+    <button class="btn btn-secondary" onclick="manageNotifications()" id="notificationBtn" style="margin-top: 10px;">
+        🔔 Enable Notifications
+    </button>
+</div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard" class="section">
+            <div class="card">
+                <h2>📊 The Whiteboard</h2>
+                
+                <div id="teamStandings" style="margin-bottom: 30px;">
+                    <h3 style="color: #3146E7; margin-bottom: 15px;">Team Standings</h3>
+                    <div class="team-leaderboard" id="teamLeaderboard"></div>
+                </div>
+                <div style="margin-bottom: 20px;">
+    <input type="text" id="leaderboardSearch" placeholder="🔍 Search by name..." 
+           style="width: 100%; max-width: 400px; padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em;"
+           oninput="searchLeaderboard(this.value)">
+</div>
+                <h3 style="color: #3146E7; margin-bottom: 15px;">Individual Rankings</h3>
+                <table class="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Team</th>
+                            <th>Total Points</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody">
+                        <tr><td colspan="4" style="text-align: center; padding: 30px;">Loading...</td></tr>
+                    </tbody>
+                </table>
+                <div id="leaderboardPagination" style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 20px;">
+    <button class="btn btn-secondary" onclick="changePage(-1)" id="prevBtn" style="padding: 10px 20px;">
+        ← Previous
+    </button>
+    <span id="pageInfo" style="font-weight: 600; color: #666;">Page 1</span>
+    <button class="btn btn-secondary" onclick="changePage(1)" id="nextBtn" style="padding: 10px 20px;">
+        Next →
+    </button>
+</div>
+                <div id="leaderboardMobile" class="leaderboard-mobile"></div>
+            </div>
+        </div>
+
+
+        <!-- Teams Page -->
+        <div id="teams" class="section">
+            <div class="card">
+                <h2>👥 Team Rosters</h2>
+                <p style="color: #666; margin-bottom: 30px;">View all team members, captains, and individual scores</p>
+                <div id="teamsContent">
+                    <p style="text-align: center; padding: 30px;">Loading teams...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Locker Room -->
+        <div id="locker" class="section">
+            <div class="card">
+                <h2>💬 The Locker Room</h2>
+                <p style="color: #666; margin-bottom: 20px;">Share PRs, wins, and talk with your teammates!</p>
+
+                <div class="locker-room-challenge" id="weeklyChallenge">
+                    <h3>🎯 This Week's Challenge</h3>
+                    <div class="challenge-text" id="challengeText">
+                        Loading challenge...
+                    </div>
+                    <button class="edit-challenge-btn" id="editChallengeBtn" style="display: none;" onclick="editChallenge()">
+                        ✏️ Edit Challenge
+                    </button>
+                </div>
+
+                <h3 style="margin-bottom: 15px;">📢 Message Board</h3>
+                <div class="messages-container" id="messagesContainer">
+                    <p style="text-align: center; padding: 30px; color: #999;">Loading messages...</p>
+                </div>
+                <div class="message-input-container">
+                    <textarea id="messageInput" placeholder="Share a PR, celebrate a win, or talk some friendly trash... 💪" maxlength="500"></textarea>
+                    <div class="char-counter" id="charCounter">0 / 500</div>
+                    <button class="btn" onclick="postMessage()" id="postMessageBtn" style="margin-top: 15px;">
+                        📤 Post Message
+                    </button>
+                </div>
+                <!-- Team Chat Section -->
+                <div style="margin-top: 50px; padding-top: 30px; border-top: 3px solid #9BFB02;">
+                    <h2 style="color: #9BFB02; margin-bottom: 20px;">🏆 Team Channels</h2>
+                    <p style="color: #666; margin-bottom: 20px;">Private chat with your teammates for strategy, motivation, and friendly competition!</p>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="margin-bottom: 15px;">Select Your Team Channel</h3>
+                        <div id="teamChannelSelector" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                            <button class="team-channel-btn team-red" onclick="switchTeamChannel('red')" style="display: none;">
+                                🔴 Red
+                            </button>
+                            <button class="team-channel-btn team-blue" onclick="switchTeamChannel('blue')" style="display: none;">
+                                🔵 Blue
+                            </button>
+                            <button class="team-channel-btn team-green" onclick="switchTeamChannel('green')" style="display: none;">
+                                🟢 Green
+                            </button>
+                            <button class="team-channel-btn team-yellow" onclick="switchTeamChannel('yellow')" style="display: none;">
+                                🟡 Yellow
+                            </button>
+                            <button class="team-channel-btn team-purple" onclick="switchTeamChannel('purple')" style="display: none;">
+                                🟣 Purple
+                            </button>
+                            <button class="team-channel-btn team-orange" onclick="switchTeamChannel('orange')" style="display: none;">
+                                🟠 Orange
+                            </button>
+                            <button class="team-channel-btn team-pink" onclick="switchTeamChannel('pink')" style="display: none;">
+                                🩷 Pink
+                            </button>
+                            <button class="team-channel-btn team-teal" onclick="switchTeamChannel('teal')" style="display: none;">
+                                🩵 Teal
+                            </button>
+                        </div>
+                        <p id="currentChannelName" style="margin-top: 10px; color: #666; font-weight: 600;"></p>
+                    </div>
+
+                    <h3 style="margin-bottom: 15px;">📢 Team Messages</h3>
+                    <div class="messages-container" id="teamMessagesContainer">
+                        <p style="text-align: center; padding: 30px; color: #999;">Select your team channel above to view messages</p>
+                    </div>
+
+                    <div class="message-input-container" id="teamMessageInput" style="display: none;">
+                        <textarea id="teamMessageText" placeholder="Message your team... 💪" maxlength="500"></textarea>
+                        <div class="char-counter" id="teamCharCounter">0 / 500</div>
+                        <button class="btn" onclick="postTeamMessage()" id="postTeamMessageBtn" style="margin-top: 15px;">
+                            📤 Post to Team
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="admin" class="section">
+            <div class="card">
+                <h2>🔧 Admin Dashboard</h2>
+                <div class="info-message">
+                    <strong>Admin Access:</strong> You can export data and manage user visibility on the leaderboard.
+                </div>
+
+                <div class="admin-controls">
+                    <div class="admin-card">
+                        <h3>Total Users</h3>
+                        <div class="stat" id="totalUsers">0</div>
+                    </div>
+                    <div class="admin-card">
+                        <h3>Total Check-ins</h3>
+                        <div class="stat" id="totalCheckins">0</div>
+                    </div>
+                    <div class="admin-card">
+                        <h3>Visible Users</h3>
+                        <div class="stat" id="visibleUsers">0</div>
+                    </div>
+                </div>
+
+                <div class="window-control">
+                    <h3 style="margin-bottom: 15px;">⏰ Check-In Window Control</h3>
+                    <p style="color: #666; margin-bottom: 15px;">
+                        Control when members can submit their weekly check-ins.
+                    </p>
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <span style="font-weight: 600;">Current Status:</span>
+                        <span class="window-status" id="windowStatus">Loading...</span>
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="window.toggleCheckinWindow(true)" style="flex: 1; min-width: 150px; background: linear-gradient(135deg, #9BFB02 0%, #7dd102 100%); color: #000;">
+                            ✅ Open Check-Ins
+                        </button>
+                        <button class="btn btn-danger" onclick="window.toggleCheckinWindow(false)" style="flex: 1; min-width: 150px;">
+                            🚫 Close Check-Ins
+                        </button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+    <h3 style="margin-bottom: 15px;">🏆 Weekly Winners Announcement</h3>
+    <p style="color: #666; margin-bottom: 15px;">
+        Post the week's top performers to the Locker Room. This will announce:
+    </p>
+    <ul style="color: #666; margin-bottom: 20px; padding-left: 20px;">
+        <li>Top individual scorer</li>
+        <li>Winning team</li>
+        <li>Most improved player (biggest week-over-week gain)</li>
+    </ul>
+    <button class="btn" onclick="announceWeeklyWinners()" style="background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%); color: #000;">
+        🎉 Announce Weekly Winners
+    </button>
+</div>
+
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+    <h3 style="margin-bottom: 15px;">🔔 Send Check-In Reminder</h3>
+    <p style="color: #666; margin-bottom: 15px;">
+        Send a browser notification to all users who have enabled notifications.
+    </p>
+    <button class="btn btn-secondary" onclick="sendCheckInReminder()">
+        📢 Send Reminder to All
+    </button>
+</div>
+                <div class="point-adjustment-section">
+                    <h3 style="margin-bottom: 15px;">🔧 Manual Point Adjustment</h3>
+                    <p style="color: #666; margin-bottom: 15px;">Add or subtract points with a reason</p>
+                    
+                    <div class="adjustment-form">
+                        <select id="adjustmentUser" class="adjustment-input">
+                            <option value="">Select User...</option>
+                        </select>
+                        <input type="number" id="adjustmentPoints" class="adjustment-input" 
+                               placeholder="Points (+10 or -5)" step="1">
+                        <input type="text" id="adjustmentReason" class="adjustment-input" 
+                               placeholder="Reason (e.g., Forgot Monday protein)" 
+                               style="grid-column: 1 / -1;">
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="applyPointAdjustment()">
+                        ✅ Apply Adjustment
+                    </button>
+
+                    <div class="adjustment-history" id="adjustmentHistory">
+                        <h4 style="margin-bottom: 10px;">Recent Adjustments</h4>
+                        <p style="color: #999; text-align: center; padding: 20px;">No adjustments yet</p>
+                    </div>
+                </div>
+
+                <div class="export-section">
+                    <h3>Export Data</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Download all user and check-in data as CSV files.</p>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn btn-secondary" onclick="exportUsersCSV()" style="flex: 1; min-width: 200px;">
+                            📊 Export All Users
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportCheckinsCSV()" style="flex: 1; min-width: 200px;">
+                            📋 Export All Check-ins
+                        </button>
+                    </div>
+                </div>
+<div style="margin-top: 30px;">
+    <h3>📝 Manage Check-In Criteria</h3>
+    <p style="margin-bottom: 15px; color: #666;">Add, edit, or remove criteria that members check in for each week.</p>
+    
+    <button class="btn" onclick="addNewCriteria()" style="margin-bottom: 20px;">
+        ➕ Add New Criteria
+    </button>
+    
+    <div id="criteriaList" style="margin-top: 20px;">
+        <p style="text-align: center; padding: 20px;">Loading criteria...</p>
+    </div>
+</div>
+                <div style="margin-top: 30px;">
+                    <h3>Customize Team Names</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Give each team a custom name while keeping their colors!</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                        <div style="background: #ff6b6b; padding: 15px; border-radius: 10px; color: white;">
+                            <strong>🔴 Red Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_red" placeholder="e.g., Red Warriors" 
+                                   onblur="window.updateTeamName('red', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+                        </div>
+                        <div style="background: #3146E7; padding: 15px; border-radius: 10px; color: white;">
+                            <strong>🔵 Blue Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_blue" placeholder="e.g., Blue Legends" 
+                                   onblur="window.updateTeamName('blue', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+                        </div>
+                        <div style="background: #9BFB02; padding: 15px; border-radius: 10px; color: #000;">
+                            <strong>🟢 Green Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_green" placeholder="e.g., Green Machines" 
+                                   onblur="window.updateTeamName('green', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}"
+                                   style="color: #000; background: rgba(255,255,255,0.8);">
+                        </div>
+                        <div style="background: #ffd93d; padding: 15px; border-radius: 10px; color: #333;">
+                            <strong>🟡 Yellow Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_yellow" placeholder="e.g., Yellow Thunder" 
+                                   onblur="window.updateTeamName('yellow', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}" 
+                                   style="color: #333; background: rgba(255,255,255,0.8);">
+                        </div>
+                        <div style="background: #a55eea; padding: 15px; border-radius: 10px; color: white;">
+                            <strong>🟣 Purple Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_purple" placeholder="e.g., Purple Reign" 
+                                   onblur="window.updateTeamName('purple', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+                        </div>
+                        <div style="background: #ff9f43; padding: 15px; border-radius: 10px; color: white;">
+                            <strong>🟠 Orange Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_orange" placeholder="e.g., Orange Crush" 
+                                   onblur="window.updateTeamName('orange', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+                        </div>
+                        <div style="background: #fd79a8; padding: 15px; border-radius: 10px; color: white;">
+                            <strong>🩷 Pink Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_pink" placeholder="e.g., Pink Panthers" 
+                                   onblur="window.updateTeamName('pink', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+                        </div>
+                        <div style="background: #00d2d3; padding: 15px; border-radius: 10px; color: white;">
+                            <strong>🩵 Teal Team</strong>
+                            <input type="text" class="team-name-input" id="teamName_teal" placeholder="e.g., Teal Titans" 
+                                   onblur="window.updateTeamName('teal', this.value)"
+                                   onkeypress="if(event.key==='Enter'){event.preventDefault();this.blur();}">
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h3>Manage User Teams & Visibility</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Assign users to teams and control leaderboard visibility.</p>
+                    <div class="user-list" id="adminUserList">
+                        <p style="text-align: center; padding: 20px;">Loading users...</p>
+                    </div>
+                </div>
+
+                <div class="export-section" style="margin-top: 30px;">
+                    <h3>Export by Team</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Download user and check-in data filtered by team.</p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <button class="btn btn-secondary" onclick="exportTeamData('red')" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);">
+                            📊 Red Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('blue')" style="background: linear-gradient(135deg, #3146E7 0%, #2236c7 100%);">
+                            📊 Blue Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('green')" style="background: linear-gradient(135deg, #9BFB02 0%, #7dd102 100%); color: #000;">
+                            📊 Green Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('yellow')" style="background: linear-gradient(135deg, #ffd93d 0%, #f5c542 100%); color: #333;">
+                            📊 Yellow Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('purple')" style="background: linear-gradient(135deg, #a55eea 0%, #8854d0 100%);">
+                            📊 Purple Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('orange')" style="background: linear-gradient(135deg, #ff9f43 0%, #ee8f34 100%);">
+                            📊 Orange Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('pink')" style="background: linear-gradient(135deg, #fd79a8 0%, #e66992 100%);">
+                            📊 Pink Team
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportTeamData('teal')" style="background: linear-gradient(135deg, #00d2d3 0%, #00b4b5 100%);">
+                            📊 Teal Team
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeProfileModal()">&times;</span>
+            <div id="profileModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Challenge Editor Modal -->
+    <div id="challengeEditorModal" class="challenge-editor-modal">
+        <div class="challenge-editor-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">✏️ Edit Weekly Challenge</h2>
+                <span class="modal-close" onclick="closeChallengeEditor()">&times;</span>
+            </div>
+
+            <div class="editor-toolbar">
+                <button class="editor-btn" onclick="insertText('**', '**')" title="Bold">
+                    <strong>B</strong>
+                </button>
+                <button class="editor-btn" onclick="insertText('*', '*')" title="Italic">
+                    <em>I</em>
+                </button>
+                <button class="editor-btn" onclick="insertText('• ', '')" title="Bullet Point">
+                    • List
+                </button>
+                <button class="editor-btn" onclick="insertText('💪 ', '')" title="Add Emoji">
+                    😊 Emoji
+                </button>
+                <button class="editor-btn" onclick="insertText('\n---\n', '')" title="Divider">
+                    ➖ Line
+                </button>
+            </div>
+
+            <textarea id="challengeEditorText" class="challenge-editor-textarea" 
+                      placeholder="Enter this week's challenge..."></textarea>
+
+            <div class="editor-preview">
+                <h3>Preview:</h3>
+                <div id="challengePreview"></div>
+            </div>
+
+            <div class="editor-actions">
+                <button class="btn" onclick="saveChallengeFromEditor()">
+                    💾 Save Challenge
+                </button>
+                <button class="btn btn-secondary" onclick="closeChallengeEditor()" 
+                        style="background: #999;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
